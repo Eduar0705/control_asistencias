@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | Sistema de Control de Asistencias</title>
+    <link rel="stylesheet" href="./css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <div class="company-name">AsistenciasPro</div>
+            </div>
+            <div class="header-actions">
+                <div class="user-menu">
+                    <div class="user-info">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role"><%= datos.nombre %></div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="#" class="menu-link active" onclick="showSection('dashboard')">
+                    <span class="menu-icon">📊</span>
+                    Inicio
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" class="menu-link" onclick="showSection('employees')">
+                    <span class="menu-icon">👥</span>
+                    Estudiantes
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" class="menu-link" onclick="showSection('attendance')">
+                    <span class="menu-icon">⏰</span>
+                    Asistencias
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" class="menu-link" onclick="showSection('reports')">
+                    <span class="menu-icon">📈</span>
+                    Reportes
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" class="menu-link" onclick="showSection('schedules')">
+                    <span class="menu-icon">📅</span>
+                    Horarios
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" class="menu-link" onclick="showSection('departments')">
+                    <span class="menu-icon">🏢</span>
+                    Departamentos
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="content-page">
+            <div class="page-header">
+                <h1 class="page-title">Inicio</h1>
+                <p class="page-subtitle">Resumen general del sistema de asistencias</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Estudiantes Activos</div>
+                        <div class="stat-icon blue">👥</div>
+                    </div>
+                    <div class="stat-number"><%= totalUsuariosCargo2 %></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Presentes Hoy</div>
+                        <div class="stat-icon green">✅</div>
+                    </div>
+                    <div class="stat-number">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Llegadas Tarde</div>
+                        <div class="stat-icon yellow">⏰</div>
+                    </div>
+                    <div class="stat-number">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Ausencias</div>
+                        <div class="stat-icon red">❌</div>
+                    </div>
+                    <div class="stat-number">0</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-action" onclick="showSection('employees')">
+                    <div class="quick-action-icon">➕</div>
+                    <div class="quick-action-title">Nuevo Estudiante</div>
+                    <div class="quick-action-desc">Registrar nuevo Estudiante</div>
+                </a>
+                <a href="#" class="quick-action" onclick="showSection('attendance')">
+                    <div class="quick-action-icon">📝</div>
+                    <div class="quick-action-title">Registrar Asistencia</div>
+                    <div class="quick-action-desc">Marcar entrada/salida manual</div>
+                </a>
+                <a href="#" class="quick-action" onclick="showSection('reports')">
+                    <div class="quick-action-icon">📊</div>
+                    <div class="quick-action-title">Generar Reporte</div>
+                    <div class="quick-action-desc">Crear reporte personalizado</div>
+                </a>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Actividad Reciente</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary">Ver Todo</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Cédula</th>
+                                <th>Puesto</th>
+                                <th>Faltas</th>
+                                <th>Asistencias</th>
+                                <th>Estado</th>
+                                <th>Cargo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% usuarios.forEach(usuario => { %>
+                                <tr>
+                                    <td><%= usuario.nombre %></td>
+                                    <td><%= usuario.email %></td>
+                                    <td><%= usuario.cedula %></td>
+                                    <td><%= usuario.puesto %></td>
+                                    <td><%= usuario.faltas %></td>
+                                    <td><%= usuario.asistencias %></td>
+                                    <td>
+                                        <span class="status-badge <%= usuario.Activo ? 'status-present' : 'status-absent' %>">
+                                            <%= usuario.Activo ? 'Activo' : 'Inactivo' %>
+                                        </span>
+                                    </td>
+                                    <td><%= usuario.cargo === 1 ? 'Administrador' : 'Estudiante' %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employees Section -->
+        <div id="employees-section" class="content-page" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Gestión de Estudiante</h1>
+                <p class="page-subtitle">Administra la información de todos los Estudiantes</p>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Lista de Estudiantes</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary">Exportar</button>
+                        <button class="btn btn-primary">+ Nuevo Estudiante</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Departamento</th>
+                                <th>Cargo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% usuarios.forEach(usuario => { %>
+                                <tr>
+                                    <td><%= usuario.id_usuario %></td>
+                                    <td><%= usuario.nombre %></td>
+                                    <td><%= usuario.departamento %></td>
+                                    <td><%= usuario.cargo == 1 ? 'Administrador' : 
+                                        usuario.cargo == 2 ? 'Supervisor' : 
+                                        'Empleado' %></td>
+                                    <td>
+                                        <span class="status-badge <%= usuario.Activo ? 'status-present' : 'status-absent' %>">
+                                            <%= usuario.Activo ? 'Activo' : 'Inactivo' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-secondary btn-sm">Editar</button>
+                                            <button class="btn btn-secondary btn-sm">Ver</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections would be similar... -->
+        <div id="attendance-section" class="content-page" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Control de Asistencias</h1>
+                <p class="page-subtitle">Monitorea y gestiona las asistencias diarias</p>
+            </div>
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Asistencias de Hoy</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary">Filtrar</button>
+                        <button class="btn btn-primary">Registro Manual</button>
+                    </div>
+                </div>
+                <p style="padding: 2rem; text-align: center; color: #64748b;">
+                    Contenido de asistencias en desarrollo...
+                </p>
+            </div>
+        </div>
+
+        <div id="reports-section" class="content-page" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Reportes y Estadísticas</h1>
+                <p class="page-subtitle">Genera reportes detallados del sistema</p>
+            </div>
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Generador de Reportes</h2>
+                </div>
+                <p style="padding: 2rem; text-align: center; color: #64748b;">
+                    Módulo de reportes en desarrollo...
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./js/admin.js"></script>
+</body>
+</html>

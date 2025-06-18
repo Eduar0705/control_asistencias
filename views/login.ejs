@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Sistema de Control de Asistencias</title>
+    <link rel="stylesheet" href="./css/login.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo-section">
+                <a href="/" class="company-name">AsistenciasPro</a>
+            </div>
+            <a href="/" class="back-btn">← Volver al Inicio</a>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="login-container">
+            <div class="login-header">
+                <h1 class="login-title">Iniciar Sesión</h1>
+                <p class="login-subtitle">Accede a tu panel de control de asistencias</p>
+            </div>
+
+            <form class="login-form" id="loginForm" action="/logininit" method="post">
+                <% if (typeof mensaje != 'undefined') { %>
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Información',
+                            text: '<%= mensaje %>',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </script>
+                <% } %>
+                <div class="form-group">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="usuario@empresa.com" autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Recordarme</label>
+                    </div>
+                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">Iniciar Sesión </button>
+            </form>
+
+            <div class="divider">
+                <span>o</span>
+            </div>
+
+            <div class="additional-options">
+                <p>¿Necesitas ayuda para acceder?</p>
+                <a href="#" class="support-link">Contactar Soporte Técnico</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="footer-text">
+                &copy; 2024 AsistenciasPro. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./js/login.js"></script>
+</body>
+</html>

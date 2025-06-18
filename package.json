@@ -1,0 +1,28 @@
+{
+  "name": "control-de-asistencias",
+  "version": "1.0.0",
+  "description": "Sistema de control de asistencias",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "asistencias",
+    "control",
+    "nodejs",
+    "express",
+    "mysql"
+  ],
+  "author": "Eduar Suarez",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "mysql": "^2.18.1",
+    "sql": "^0.78.0"
+  }
+}
