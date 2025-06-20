@@ -3,35 +3,31 @@ const router = express.Router();
 const link = require('../config/link');
 const conexion = require('../config/conxion_bd');
 
-router.get("/admin", function(req, res) {
+router.get("/admin", function (req, res) {
     if (!req.session || !req.session.login) {
         return res.render("login", { mensaje: "Por favor, inicia sesión.", link });
     }
 
-    // Consulta 1: Contar usuarios con cargo = 2
-    const countQuery = "SELECT COUNT(*) AS totalUsuariosCargo2 FROM usuarios WHERE cargo = 2";
-    
-    // Consulta 2: Obtener todos los usuarios con los campos requeridos
-    const usersQuery = `
-        SELECT 
-            nombre, 
-            email, 
-            clave, 
-            cedula, 
-            puesto, 
-            faltas, 
-            asistencias, 
-            Activo, 
-            cargo 
-        FROM usuarios
+    // OBTIENE A TODOS LOS ADMINISTRADORES O PROFESORES
+    const adminQuery = `
+        SELECT nombre, email, clave, cedula, puesto, faltas, asistencias, Activo, cargo 
+        FROM usuarios 
+        WHERE cargo = 1
     `;
 
-    // Ejecutamos ambas consultas en paralelo (mejor rendimiento)
+    // OBTIENE A TODOS LOS ESTUDIANTES O USUARIOS
+    const usersQuery = `
+        SELECT nombre, email, clave, cedula, puesto, faltas, asistencias, Activo, cargo 
+        FROM usuarios 
+        WHERE cargo = 2
+    `;
+
+    // EJECUTA AMBAS CONSULTAS EN PARALELO
     Promise.all([
         new Promise((resolve, reject) => {
-            conexion.query(countQuery, (err, results) => {
+            conexion.query(adminQuery, (err, results) => {
                 if (err) reject(err);
-                else resolve(results[0].totalUsuariosCargo2);
+                else resolve(results);
             });
         }),
         new Promise((resolve, reject) => {
@@ -41,11 +37,12 @@ router.get("/admin", function(req, res) {
             });
         })
     ])
-    .then(([totalUsuariosCargo2, usuarios]) => {
+    .then(([admins, usuarios]) => {
+        // ASEGÚRATE DE QUE AMBAS VARIABLES EXISTAN
         res.render("admin", { 
             datos: req.session,
-            totalUsuariosCargo2,
-            usuarios,  // Lista completa de usuarios
+            admins: admins || [],      // Si admins es null/undefined, usa array vacío
+            usuarios: usuarios || [],   // Si usuarios es null/undefined, usa array vacío
             link
         });
     })

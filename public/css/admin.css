@@ -467,3 +467,8 @@
                 display: block;
             }
         }
+        .swal2-icon.sin-circulo {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
