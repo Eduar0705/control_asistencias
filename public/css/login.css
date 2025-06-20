@@ -309,6 +309,11 @@
             font-size: 0.9rem;
         }
 
+        .company-logo{
+            width: 150px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
         /* Responsive */
         @media (max-width: 768px) {
             .nav-container {
