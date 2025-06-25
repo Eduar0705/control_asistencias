@@ -10,14 +10,14 @@ router.get("/admin", function (req, res) {
 
     // OBTIENE A TODOS LOS ADMINISTRADORES O PROFESORES
     const adminQuery = `
-        SELECT nombre, email, clave, cedula, puesto, faltas, asistencias, Activo, cargo 
+        SELECT nombre, email, clave, cedula, puesto, faltas, asistencias, Activo, cargo, departamento 
         FROM usuarios 
         WHERE cargo = 1
     `;
 
     // OBTIENE A TODOS LOS ESTUDIANTES O USUARIOS
     const usersQuery = `
-        SELECT nombre, email, clave, cedula, puesto, faltas, asistencias, Activo, cargo 
+        SELECT nombre, email, clave, cedula, puesto, faltas, asistencias, Activo, cargo, departamento 
         FROM usuarios 
         WHERE cargo = 2
     `;
@@ -41,8 +41,8 @@ router.get("/admin", function (req, res) {
         // ASEGÚRATE DE QUE AMBAS VARIABLES EXISTAN
         res.render("admin", { 
             datos: req.session,
-            admins: admins || [],      // Si admins es null/undefined, usa array vacío
-            usuarios: usuarios || [],   // Si usuarios es null/undefined, usa array vacío
+            admins: admins,
+            usuarios: usuarios || [],
             link
         });
     })

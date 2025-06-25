@@ -1,44 +1,41 @@
-// Navigation functionality
+/*
+*************************************************************\
+***** Funciones de la aplicacion en javascript***************\
+**************************************************************\ 
+ */
 function showSection(sectionName) {
-    // Hide all sections
     const sections = document.querySelectorAll('.content-page');
     sections.forEach(section => {
         section.style.display = 'none';
     });
 
-    // Show selected section
     const targetSection = document.getElementById(sectionName + '-section');
     if (targetSection) {
         targetSection.style.display = 'block';
     }
 
-    // Update active menu item
     const menuLinks = document.querySelectorAll('.menu-link');
     menuLinks.forEach(link => {
         link.classList.remove('active');
     });
 
-    // Find and activate the clicked menu item
     const activeLink = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
     if (activeLink) {
         activeLink.classList.add('active');
     }
 
-    // Close sidebar on mobile after selection
     if (window.innerWidth <= 1024) {
         toggleSidebar();
     }
 }
 
-// Sidebar toggle functionality
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    // Toggle both 'collapsed' and 'open' classes for compatibility
     sidebar.classList.toggle('collapsed');
     sidebar.classList.toggle('open');
 }
 
-// Logout functionality with modern alert
+// Verificaion de cerrar sesion
 function logout() {
     Swal.fire({
         title: '¿Cerrar sesión?',
@@ -61,19 +58,19 @@ function logout() {
                 title: 'Sesión finalizada',
                 text: 'Cerrando tu sesión...',
                 icon: 'success',
-                timer: 2000,
+                timer: 1500,
                 timerProgressBar: true,
                 showConfirmButton: false,
                 willClose: () => {
-                    // Redirect to login page
-                    window.location.href = '/logout';
+                    // Al confirmar, redirigir al inicio de sesión
+                    window.location.href = '/login';
                 }
             });
         }
     });
 }
 
-// User management functions
+// Edita usuario
 function editarUsuario(cedula) {
     Swal.fire({
         title: 'Editar Usuario',
@@ -82,6 +79,7 @@ function editarUsuario(cedula) {
     });
 }
 
+//Funcion para mostrar los datos de un usuario
 function verUsuario(cedula) {
     const filas = document.querySelectorAll('tbody tr');
     let usuarioData = null;
@@ -153,23 +151,7 @@ function verUsuario(cedula) {
     });
 }
 
-function editarAdmin(cedula) {
-    Swal.fire({
-        title: 'Editar Administrador',
-        text: `Editando administrador con cédula: ${cedula}`,
-        icon: 'info'
-    });
-}
-
-function verAdmin(cedula) {
-    Swal.fire({
-        title: 'Ver Administrador',
-        text: `Viendo detalles del administrador con cédula: ${cedula}`,
-        icon: 'info'
-    });
-}
-
-// Close sidebar when clicking outside on mobile
+// Menu toggle lateral
 document.addEventListener('click', function(event) {
     const sidebar = document.getElementById('sidebar');
     const menuToggle = document.querySelector('.menu-toggle');
@@ -183,53 +165,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// Update time every second (for demo purposes)
-function updateTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('es-ES');
-    const timeElement = document.getElementById('current-time');
-    if (timeElement) {
-        timeElement.textContent = timeString;
-    }
-}
-
-// Notification example
-function showNotification() {
-    const notification = document.createElement('div');
-    notification.className = 'modern-notification';
-    notification.innerHTML = `
-        <div class="notification-icon">
-            <i class="fas fa-bell"></i>
-        </div>
-        <div class="notification-content">
-            <div class="notification-title">Nueva actualización</div>
-            <div class="notification-message">Tu sistema se ha actualizado a la versión 2.3</div>
-        </div>
-        <div class="notification-close">
-            <i class="fas fa-times"></i>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-    
-    // Close on click
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    });
-}
-
-// Initialize dashboard
+// Inicializar la paguina principal
 document.addEventListener('DOMContentLoaded', function() {
     showSection('dashboard');
     updateTime();
