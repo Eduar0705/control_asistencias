@@ -1,6 +1,6 @@
 /*
 *************************************************************\
-***** Funciones de la aplicacion en javascript***************\
+*******Funciones de la aplicacion en javascript***************\
 **************************************************************\ 
  */
 function showSection(sectionName) {
@@ -185,4 +185,13 @@ document.addEventListener('DOMContentLoaded', function() {
             showConfirmButton: false
         });
     }, 1000);
+});
+
+// Filtrar la tabla según la carrera seleccionada
+document.getElementById('filter').addEventListener('change', function() {
+    const selectedDepartamento = this.value;
+    const rows = document.querySelectorAll('#attendance-table tbody tr[data-departamento]');
+    rows.forEach(row => {
+        row.style.display = selectedDepartamento === '' || row.dataset.departamento === selectedDepartamento ? '' : 'none';
+    });
 });

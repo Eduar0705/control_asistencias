@@ -10,11 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="logo-section">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <img src="./img/logo.png" alt="Logo" style="width: 50px; height: 50px;">
                 <div class="company-name">Asistens</div>
             </div>
             <div class="header-actions">
@@ -29,7 +29,6 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <ul class="sidebar-menu">
             <li class="menu-item">
@@ -65,9 +64,8 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Dashboard Section -->
+        <!-- Paguina de Inicio -->
         <div id="dashboard-section" class="content-page">
             <div class="page-header">
                 <h1 class="page-title">Inicio</h1>
@@ -113,7 +111,6 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
             <div class="quick-actions">
                 <a href="#" class="quick-action" onclick="showSection('employees')">
                     <div class="quick-action-icon">➕</div>
@@ -132,40 +129,73 @@
                 </a>
             </div>
 
-            <!-- Recent Activity -->
             <div class="content-section">
                 <div class="section-header">
-                    <h2 class="section-title">Actividad Reciente</h2>
+                    <h2 class="section-title">Estudiantes</h2>
                     <div class="section-actions">
                         <button class="btn btn-secondary" onclick="showSection('employees')">Ver Todo</button>
                     </div>
                 </div>
                 <div class="table-container">
+                    <% 
+                    // Función para obtener el nombre del departamento (server-side)
+                    function getNombreDepartamento(codigo) {
+                        switch (Number(codigo)) { // Asegurar que el código sea un número
+                            case 1: return 'Informática';
+                            case 2: return 'Administración';
+                            case 3: return 'Contaduría';
+                            case 4: return 'Mecánica Industrial';
+                            case 5: return 'Electrotecnia';
+                            case 6: return 'Eléctrica';
+                            case 7: return 'Educación';
+                            default: return 'Departamento no encontrado';
+                        }
+                    }
+
+                    // Validar que usuarios existe y es un array
+                    const usuariosAleatorios = (usuarios && Array.isArray(usuarios) && usuarios.length > 0)
+                        ? usuarios
+                            .slice() // Copia el array para no afectar el original
+                            .sort(() => Math.random() - 0.5) // Mezcla aleatoriamente
+                            .slice(0, Math.min(5, usuarios.length)) // Toma hasta 5 elementos o menos si no hay suficientes
+                        : [];
+                    %>
+
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
                                 <th>Cédula</th>
                                 <th>Carrera</th>
-                                <th>Cargo</th>
+                                <th>Actividad</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <% usuarios.forEach(usuario => { %>
+                            <% if (usuariosAleatorios.length === 0) { %>
                                 <tr>
-                                    <td><%= usuario.nombre %></td>
-                                    <td><%= usuario.cedula %></td>
-                                    <td><%= usuario.departamento %></td>
-                                    <td><%= usuario.cargo === 1 ? 'Administrador' : 'Estudiante' %></td>
+                                    <td colspan="4">No hay usuarios disponibles</td>
                                 </tr>
-                            <% }); %>
+                            <% } else { %>
+                                <% usuariosAleatorios.forEach(usuario => { %>
+                                    <tr>
+                                        <td><%= usuario.nombre || 'Sin nombre' %></td>
+                                        <td><%= usuario.cedula || 'Sin cédula' %></td>
+                                        <td><%= getNombreDepartamento(usuario.departamento) %></td>
+                                        <td>
+                                            <span class="status-badge <%= usuario.Activo ? 'status-present' : 'status-absent' %>">
+                                                <%= usuario.Activo ? 'Activo' : 'Inactivo' %>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } %>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Employees Section -->
+        <!-- Seccion de Estudiantes -->
         <div id="employees-section" class="content-page" style="display: none;">
             <div class="page-header">
                 <h1 class="page-title">Gestión de Estudiantes</h1>
@@ -200,7 +230,7 @@
                                     <td><%= usuario.cedula %></td>
                                     <td><%= usuario.nombre %></td>
                                     <td><%= usuario.email %></td>
-                                    <td><%= usuario.departamento %></td>
+                                    <td><%= getNombreDepartamento(usuario.departamento) %></td>
                                     <td><%= usuario.faltas %></td>
                                     <td><%= usuario.asistencias %></td>
                                     <td>
@@ -222,7 +252,7 @@
             </div>
         </div>
 
-        <!-- Other sections would be similar... -->
+        <!-- Seccion de Asistencias -->
         <div id="attendance-section" class="content-page" style="display: none;">
             <div class="page-header">
                 <h1 class="page-title">Control de Asistencias</h1>
@@ -232,8 +262,16 @@
                 <div class="section-header">
                     <h2 class="section-title">Asistencias de Hoy</h2>
                     <div class="section-actions">
-                        <button class="btn btn-secondary">Filtrar</button>
-                        <button class="btn btn-primary">Registro Manual</button>
+                        <select name="filter" id="filter">
+                            <option value="">Selecione una carrera</option>
+                            <option value="1">Carrera 1</option>
+                            <option value="2">Carrera 2</option>
+                            <option value="3">Carrera 3</option>
+                            <option value="4">Carrera 4</option>
+                            <option value="5">Carrera 5</option>
+                            <option value="6">Carrera 6</option>
+                            <option value="7">Carrera 7</option>
+                        </select>
                     </div>
                 </div>
                 <p style="padding: 2rem; text-align: center; color: #64748b;">
@@ -242,9 +280,10 @@
             </div>
         </div>
 
+        <!-- Seccion de Reportes -->
         <div id="reports-section" class="content-page" style="display: none;">
             <div class="page-header">
-                <h1 class="page-title">Reportes y Estadísticas</h1>
+                <h1 class="page-title">Reportes</h1>
                 <p class="page-subtitle">Genera reportes detallados del sistema</p>
             </div>
             <div class="content-section">
@@ -257,10 +296,11 @@
             </div>
         </div>
 
+        <!-- Seccion de Horarios -->
         <div id="schedules-section" class="content-page" style="display: none;">
             <div class="page-header">
                 <h1 class="page-title">Gestión de Horarios</h1>
-                <p class="page-subtitle">Configura los horarios de trabajo</p>
+                <p class="page-subtitle">Configura los horarios de estudios</p>
             </div>
             <div class="content-section">
                 <div class="section-header">
