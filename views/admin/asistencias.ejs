@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | Asistencias</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/asistencias.css">
+    <link rel="shortcut icon" href="../img/asistens.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <img src="../img/logo.png" alt="Logo" style="width: 50px; height: 50px;">
+                <div class="company-name">Asistens</div>
+            </div>
+            <div class="header-actions">
+                <div class="user-menu">
+                    <div class="user-info">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role"><%= datos.nombre %></div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a class="menu-link active" href="/admin">
+                    <span class="menu-icon">📊</span>
+                    Inicio
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="showSection('employees')">
+                    <span class="menu-icon">👥</span>
+                    Estudiantes
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="showSection('attendance')">
+                    <span class="menu-icon">⏰</span>
+                    Asistencias
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="showSection('reports')">
+                    <span class="menu-icon">📈</span>
+                    Reportes
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" onclick="showSection('schedules')">
+                    <span class="menu-icon">📅</span>
+                    Horarios
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Control de Asistencias</h1>
+                <div>
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" class="fecha-input" value="<%= new Date().toISOString().split('T')[0] %>">
+                </div>
+            </div>
+
+            <% if (typeof mensaje !== 'undefined') { %>
+                <div class="mensaje exito"><%= mensaje %></div>
+            <% } %>
+
+            <form id="asistenciasForm" method="POST" action="/admin/asistencias/guardar">
+                <input type="hidden" name="fecha" id="fechaHidden">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Cédula</th>
+                            <th>Departamento</th>
+                            <th class="checkbox-cell">Presente</th>
+                            <th class="checkbox-cell">Ausente</th>
+                            <th>Total Asistencias</th>
+                            <th>Total Faltas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% estudiantes.forEach(estudiante => { %>
+                        <tr>
+                            <td><%= estudiante.nombre %></td>
+                            <td><%= estudiante.cedula %></td>
+                            <td><%= estudiante.departamento || 'Sin asignar' %></td>
+                            <td class="checkbox-cell">
+                                <input type="radio" name="asistencias[<%= estudiante.id_usuario %>]" value="true" id="presente_<%= estudiante.id_usuario %>">
+                                <label for="presente_<%= estudiante.id_usuario %>" class="presente">✓</label>
+                            </td>
+                            <td class="checkbox-cell">
+                                <input type="radio" name="asistencias[<%= estudiante.id_usuario %>]" value="false" id="ausente_<%= estudiante.id_usuario %>">
+                                <label for="ausente_<%= estudiante.id_usuario %>" class="ausente">✗</label>
+                            </td>
+                            <td class="totales"><%= estudiante.asistencias || 0 %></td>
+                            <td class="totales"><%= estudiante.faltas || 0 %></td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-sm" onclick="abrirModalEditar('<%= estudiante.id_usuario %>')">
+                                    Editar
+                                </button>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+
+                <div class="acciones">
+                    <button type="button" class="btn btn-secondary" onclick="marcarTodos(true)">Marcar Todos Presentes</button>
+                    <button type="button" class="btn btn-secondary" onclick="marcarTodos(false)">Marcar Todos Ausentes</button>
+                    <button type="button" class="btn btn-secondary" onclick="limpiarSeleccion()">Limpiar Selección</button>
+                    <button type="submit" class="btn btn-success">💾 Guardar Asistencias del Día</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal para editar asistencias -->
+        <div id="modalEditar" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="cerrarModal()">&times;</span>
+                <h3>Editar Asistencias</h3>
+                <form id="formEditar" method="POST">
+                    <div class="form-group">
+                        <label for="nombreEstudiante">Estudiante:</label>
+                        <input type="text" id="nombreEstudiante" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="editarAsistencias">Total Asistencias:</label>
+                        <input type="number" id="editarAsistencias" name="asistencias" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editarFaltas">Total Faltas:</label>
+                        <input type="number" id="editarFaltas" name="faltas" min="0" required>
+                    </div>
+                    <div class="acciones">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        // Cargar SweetAlert2 desde CDN (si no lo has incluido ya en el head)
+        if (typeof Swal === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+            document.head.appendChild(script);
+        }
+
+        // Función de ayuda para mostrar alertas
+        function showAlert(icon, title, text, confirmText = 'Aceptar') {
+            return Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+                confirmButtonText: confirmText,
+                confirmButtonColor: '#3085d6',
+            });
+        }
+
+        // Actualizar fecha oculta cuando cambie la fecha visible
+        document.getElementById('fecha').addEventListener('change', function() {
+            document.getElementById('fechaHidden').value = this.value;
+        });
+
+        // Establecer fecha inicial
+        document.getElementById('fechaHidden').value = document.getElementById('fecha').value;
+
+        // Función para marcar todos como presentes o ausentes
+        function marcarTodos(presente) {
+            const radios = document.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                if ((presente && radio.value === 'true') || (!presente && radio.value === 'false')) {
+                    radio.checked = true;
+                }
+            });
+            
+            showAlert('success', 'Operación completada', 
+                        `Todos los estudiantes han sido marcados como ${presente ? 'presentes' : 'ausentes'}`);
+        }
+
+        // Función para limpiar toda la selección
+        function limpiarSeleccion() {
+            const radios = document.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                radio.checked = false;
+            });
+            
+            showAlert('info', 'Selección limpiada', 'Todas las selecciones han sido restablecidas');
+        }
+
+        // Funciones del modal
+        async function abrirModalEditar(idUsuario) {
+            try {
+                const response = await fetch(`/admin/asistencias/estudiante/${idUsuario}`);
+                if (!response.ok) throw new Error('Error al cargar datos');
+                
+                const data = await response.json();
+                
+                document.getElementById('nombreEstudiante').value = data.nombre;
+                document.getElementById('editarAsistencias').value = data.asistencias || 0;
+                document.getElementById('editarFaltas').value = data.faltas || 0;
+                document.getElementById('formEditar').action = `/admin/asistencias/editar/${idUsuario}`;
+                document.getElementById('modalEditar').style.display = 'block';
+                
+            } catch (error) {
+                console.error(error);
+                await showAlert('error', 'Error', 'No se pudieron cargar los datos del estudiante');
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalEditar').style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalEditar');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Validar formulario antes de enviar
+        document.getElementById('asistenciasForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validación 1: Al menos un estudiante marcado
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            if (radios.length === 0) {
+                await showAlert('warning', 'Validación', 'Por favor, marca al menos un estudiante como presente o ausente.');
+                return false;
+            }
+            
+            // Validación 2: Fecha seleccionada
+            const fecha = document.getElementById('fecha').value;
+            if (!fecha) {
+                await showAlert('warning', 'Validación', 'Por favor, selecciona una fecha.');
+                return false;
+            }
+            
+            // Confirmación antes de enviar
+            const result = await Swal.fire({
+                title: '¿Confirmar acción?',
+                text: '¿Estás seguro de guardar estas asistencias?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, guardar',
+                cancelButtonText: 'Cancelar'
+            });
+            
+            if (result.isConfirmed) {
+                // Enviar formulario si se confirma
+                this.submit();
+            }
+        });
+
+        // Manejar mensajes del servidor (si vienen en la URL)
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mensaje = urlParams.get('mensaje');
+            const error = urlParams.get('error');
+            
+            if (mensaje) {
+                showAlert('success', 'Éxito', mensaje);
+            }
+            if (error) {
+                showAlert('error', 'Error', error);
+            }
+        });
+    </script>
+</body>
+</html>

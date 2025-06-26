@@ -17,11 +17,12 @@ app.use(session({
 
 //RUTAS ESTATICAS
 app.use(express.static('public'));
-app.use(require('./routers/login'));//Login
-app.use(require('./routers/logininit'));//logica login
+app.use(require('./routers/login'));
+app.use(require('./routers/logininit'));
 
 //ADMINISTRACION
 app.use(require('./routers/admin'));
+app.use(require('./routers/Asistencias'));
 
 //PUERTO DEL SERVIDOR
 const PORT = process.env.PORT || 3002;
